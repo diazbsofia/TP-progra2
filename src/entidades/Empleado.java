@@ -1,40 +1,38 @@
 package entidades;
 
+/**
+ * Clase abstracta Empleado
+ *
+ * Representa un empleado genérico del sistema.
+ *
+ * IREP:
+ * - legajo > 0
+ * - nombre no nulo ni vacío
+ * - cantidadRetrasos >= 0
+ * - Si ocupado = true, está asignado a una tarea activa
+ * - Si ocupado = false, no está asignado a ninguna tarea
+ */
 public abstract class Empleado {
-    private String nombre;
-    private Integer legajo;
-    private boolean ocupado;
-    private double valorHora;
-    private int cantidadRetrasos;
-    
-    
-	public Empleado(String nombre, Integer legajo, double valorHora) {
-	        
-	        if (nombre == null || nombre.isEmpty()) {
-	            throw new IllegalArgumentException("El nombre no puede estar vacío");
-	        }
-	        
-	        if (legajo == null || legajo <= 0) {
-	            throw new IllegalArgumentException("El legajo tiene que ser mayor a 0");
-	        }
-	        
-	        if (valorHora <= 0) {
-	            throw new IllegalArgumentException("El valor por hora tiene que ser mayor a 0");
-	        }
-	        
-	        this.nombre = nombre;
-	        this.legajo = legajo;
-	        this.ocupado = false;
-	        this.valorHora = valorHora;
-	        this.cantidadRetrasos = 0;
-	    }
+    protected String nombre;
+    protected int legajo;
+    protected boolean ocupado;
+    protected int cantidadRetrasos;
+
+    public Empleado(String nombre, int legajo) {
+        if (nombre == null || nombre.isEmpty() || legajo <= 0)
+            throw new IllegalArgumentException("Datos de empleado inválidos.");
+        this.nombre = nombre;
+        this.legajo = legajo;
+        this.ocupado = false;
+        this.cantidadRetrasos = 0;
+    }
 
     public void asignar() {
-        this.ocupado = true;
+        ocupado = true;
     }
 
     public void liberar() {
-        this.ocupado = false;
+        ocupado = false;
     }
 
     public boolean estaLibre() {
@@ -42,14 +40,14 @@ public abstract class Empleado {
     }
 
     public void registrarRetraso() {
-        this.cantidadRetrasos++;
+        cantidadRetrasos++;
     }
 
-    public int obtenerCantidadRetrasos() {
+    public int getCantidadRetrasos() {
         return cantidadRetrasos;
     }
 
-    public Integer getLegajo() {
+    public int getLegajo() {
         return legajo;
     }
 
@@ -57,18 +55,15 @@ public abstract class Empleado {
         return nombre;
     }
 
-    public boolean isOcupado() {
+    public boolean estaOcupado() {
         return ocupado;
     }
-    
-    public double getValorHora() {
-        return valorHora;
-    }
 
-    public abstract double calcularPago(double diasTrabajados);
+    // Método abstracto: se sobreescribe en subclases
+    public abstract double calcularPago(int diasTrabajados);
 
     @Override
     public String toString() {
-        return legajo + " - " + nombre;
+        return legajo + " - " + nombre + " (Retrasos: " + cantidadRetrasos + ")";
     }
 }

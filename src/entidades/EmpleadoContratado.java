@@ -1,23 +1,39 @@
 package entidades;
 
+/**
+ * Representa un empleado contratado por hora.
+ *
+ * IREP:
+ * - valorHora > 0
+ * - cantidadRetrasos >= 0
+ */
 public class EmpleadoContratado extends Empleado {
-    //private double valorHora;
+    private double valorHora;
 
-    public EmpleadoContratado(String nombre, Integer legajo, double valorHora) {
-        super(nombre, legajo, valorHora);
+    public EmpleadoContratado(String nombre, int legajo, double valorHora) {
+        super(nombre, legajo);
+        if (valorHora <= 0)
+            throw new IllegalArgumentException("Valor hora inválido.");
+        this.valorHora = valorHora;
     }
 
     @Override
-    public double calcularPago(double dias) {
-        return super.getValorHora() * dias * 8;
+    public double calcularPago(int diasTrabajados) {
+        return valorHora * 8 * diasTrabajados;
     }
 
     public double getValorHora() {
-        return super.getValorHora();
+        return valorHora;
+    }
+
+    public void setValorHora(double valorHora) {
+        if (valorHora <= 0)
+            throw new IllegalArgumentException("Valor hora inválido.");
+        this.valorHora = valorHora;
     }
 
     @Override
     public String toString() {
-        return super.toString() + " (Contratado - $" + super.getValorHora() + "/hora)";
+        return super.toString() + " - Contratado ($" + valorHora + "/hora)";
     }
 }
