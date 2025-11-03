@@ -1,237 +1,349 @@
 package entidades;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 public class HomeSolution implements IHomeSolution {
-    
+
     private Map<Integer, Empleado> empleados;
     private Map<Integer, Proyecto> proyectos;
     private List<Empleado> empleadosLibres;
-    
+    private int contadorProyectos;
+    private int contadorLegajos;
+
     public HomeSolution() {
         this.empleados = new HashMap<>();
         this.proyectos = new HashMap<>();
         this.empleadosLibres = new ArrayList<>();
+        this.contadorProyectos = 0;
+        this.contadorLegajos = 0;
     }
-    
-    /**
-     * Registra un empleado con un nombre y un valor base por hora.     *
-     * @param nombre Nombre del empleado.
-     * @param valor Valor de trabajo del empleado.
-     * @throws IllegalArgumentException Si el nombre es nulo o vacío, o el valor es negativo.
-     */
-    public void registrarEmpleado(String nombre, double valor) throws IllegalArgumentException;
-
-    /**
-     * Registra un empleado con nombre, valor y categoría.     *
-     * @param nombre Nombre del empleado.
-     * @param valor Valor de trabajo del empleado.
-     * @param categoria Categoría del empleado (por ejemplo, "Junior", "Senior").
-     * @throws IllegalArgumentException Si alguno de los parámetros es inválido.
-     */
-    public void registrarEmpleado(String nombre, double valor, String categoria) throws IllegalArgumentException;
 
     // ============================================================
-    // REGISTRO Y GESTIÓN DE PROYECTOS
+    // REGISTRO DE EMPLEADOS
     // ============================================================
 
-    /**
-     * Registra un nuevo proyecto en el sistema.
-     *
-     * @param titulos Títulos de las tareas del proyecto.
-     * @param descripcion Descripciones de cada tarea.
-     * @param dias Días estimados de duración de cada tarea.
-     * @param domicilio Domicilio donde se desarrollará el proyecto.
-     * @param cliente Datos del cliente (nombre, mail, teléfono).
-     * @param inicio Fecha de inicio del proyecto (formato YYYY-MM-DD).
-     * @param fin Fecha de finalización estimada (formato YYYY-MM-DD).
-     * @throws IllegalArgumentException Si los datos son inconsistentes o faltan.
-     */
+    @Override
+    public void registrarEmpleado(String nombre, double valor) throws IllegalArgumentException {
+        if (nombre == null || nombre.isEmpty() || valor <= 0)
+            throw new IllegalArgumentException("Datos inválidos para empleado contratado.");
+
+        contadorLegajos++;
+        EmpleadoContratado emp = new EmpleadoContratado(nombre, contadorLegajos, valor);
+        empleados.put(emp.getLegajo(), emp);
+        empleadosLibres.add(emp);
+    }
+
+    @Override
+    public void registrarEmpleado(String nombre, double valor, String categoria) throws IllegalArgumentException {
+        if (nombre == null || nombre.isEmpty() || valor <= 0)
+            throw new IllegalArgumentException("Datos inválidos para empleado de planta.");
+        if (!categoria.equals("INICIAL") && !categoria.equals("TECNICO") && !categoria.equals("EXPERTO"))
+            throw new IllegalArgumentException("Categoría inválida.");
+
+        contadorLegajos++;
+        EmpleadoPlanta emp = new EmpleadoPlanta(nombre, contadorLegajos, valor, categoria);
+        empleados.put(emp.getLegajo(), emp);
+        empleadosLibres.add(emp);
+    }
+
+    // ============================================================
+    // REGISTRO DE PROYECTOS
+    // ============================================================
+
+    @Override
     public void registrarProyecto(String[] titulos, String[] descripcion, double[] dias,
                                   String domicilio, String[] cliente, String inicio, String fin)
-            throws IllegalArgumentException;
+            throws IllegalArgumentException {
+
+        if (titulos == null || descripcion == null || dias == null || cliente == null)
+            throw new IllegalArgumentException("Datos del proyecto incompletos.");
+        if (titulos.length == 0)
+            throw new IllegalArgumentException("Debe haber al menos una tarea.");
+
+        contadorProyectos++;
+
+        List<Tarea> listaTareas = new ArrayList<>();
+        for (int i = 0; i < titulos.length; i++) {
+            listaTareas.add(new Tarea(titulos[i], descripcion[i], dias[i]));
+        }
+
+        Proyecto proyecto = new Proyecto(contadorProyectos, cliente, domicilio, listaTareas, inicio, fin);
+        proyectos.put(contadorProyectos, proyecto);
+    }
 
     // ============================================================
-    // ASIGNACIÓN Y GESTIÓN DE TAREAS
+    // CONSULTAS BÁSICAS
     // ============================================================
 
-    /**
-     * Asigna un empleado responsable a una tarea específica dentro de un proyecto.     *
-     * @param numero Número o código del proyecto.
-     * @param titulo Título de la tarea a asignar.
-     * @throws Exception si intenta asignar a una tarea ya asignada o el proyecto esta finalizado
-     */
-    public void asignarResponsableEnTarea(Integer numero, String titulo) throws Exception;
+    @Override
+    public Object[] empleadosNoAsignados() {
+        List<Empleado> libres = new ArrayList<>();
+        for (Empleado e : empleados.values()) {
+            if (e.estaLibre())
+                libres.add(e);
+        }
+        return libres.toArray();
+    }
 
-    /**
-     * Asigna a la tarea el empleado con menos retrasos acumulados.
-     *
-     * @param numero Número o código del proyecto.
-     * @param titulo Título de la tarea.
-     *@throws Exception si no hay empleados disponibles o la tarea ya fue asignada o el proyecto esta finalizado
-     */
-    public void asignarResponsableMenosRetraso(Integer numero, String titulo) throws Exception;
+    @Override
+    public boolean estaFinalizado(Integer numero) {
+        Proyecto p = proyectos.get(numero);
+        if (p == null) throw new IllegalArgumentException("Proyecto inexistente.");
+        return p.estaFinalizado();
+    }
 
-    /**
-     * Registra un retraso en una tarea de un proyecto.
-     * Un retraso modifica la fecha real de finalización.     *
-     * @param numero Número o código del proyecto.
-     * @param titulo Título de la tarea.
-     * @param cantidadDias Días de retraso acumulados.
-     * @throws IllegalArgumentException Si los valores son incorrectos.
-     */
-    public void registrarRetrasoEnTarea(Integer numero, String titulo, double cantidadDias) throws IllegalArgumentException;
+    @Override
+    public List<Tupla<Integer, String>> proyectosActivos() {
+        List<Tupla<Integer, String>> lista = new ArrayList<>();
+        for (Proyecto p : proyectos.values()) {
+            if (p.estaActivo())
+                lista.add(new Tupla<>(p.getNumero(), p.getDireccion()));
+        }
+        return lista;
+    }
 
-    /**
-     * Agrega una nueva tarea a un proyecto existente, tener en cuenta que se modifica
-     * la fecha de finalización tanto la real como la prevista.
-     * @param numero Número o código del proyecto.
-     * @param titulo Título de la nueva tarea.
-     * @param descripcion Descripción de la tarea.
-     * @param dias Días estimados de duración.
-     * @throws IllegalArgumentException Si los valores son incorrectos o el proyecto ya esta finalizado.
-     */
-    public void agregarTareaEnProyecto(Integer numero, String titulo, String descripcion, double dias) throws  IllegalArgumentException;
+    @Override
+    public List<Tupla<Integer, String>> proyectosPendientes() {
+        List<Tupla<Integer, String>> lista = new ArrayList<>();
+        for (Proyecto p : proyectos.values()) {
+            if (p.estaPendiente())
+                lista.add(new Tupla<>(p.getNumero(), p.getDireccion()));
+        }
+        return lista;
+    }
 
-    /**
-     * Marca una tarea como finalizada.     *
-     * @param numero Número o código del proyecto.
-     * @param titulo Título de la tarea a finalizar.
-     * @throws Exception Si la tarea ya estaba finalizada.
-     */
-    public void finalizarTarea(Integer numero, String titulo)
-            throws Exception;
-
-    /**
-     * Marca un proyecto completo como finalizado.
-     * @param numero Número o código del proyecto.
-     * @param fin Fecha de inicio de finalización (formato YYYY-MM-DD).
-     * @throws IllegalArgumentException si la fecha es incorrecta( anterior a la fecha de inicio)
-     */
-    public void finalizarProyecto(Integer numero, String fin) throws IllegalArgumentException;
-
+    @Override
+    public List<Tupla<Integer, String>> proyectosFinalizados() {
+        List<Tupla<Integer, String>> lista = new ArrayList<>();
+        for (Proyecto p : proyectos.values()) {
+            if (p.estaFinalizado())
+                lista.add(new Tupla<>(p.getNumero(), p.getDireccion()));
+        }
+        return lista;
+    }
 
     // ============================================================
-    // REASIGNACIÓN DE EMPLEADOS
+    // TO STRING GENERAL
     // ============================================================
 
-    /**
-     * Reasigna un empleado a una tarea determinada dentro de un proyecto.
-     * Libera al empleado anterior.
-     * @param numero Número o código del proyecto.
-     * @param legajo Legajo del empleado a reasignar.
-     * @param titulo Título de la tarea.
-     * @throw  Exception si no hay empleados disponibles o si no tiene asignado un empleado previamente
-     */
-    public void reasignarEmpleadoEnProyecto(Integer numero, Integer legajo, String titulo) throws Exception;
-
-    /**
-     * Reasigna al empleado con menos retrasos acumulados a una tarea.
-     * Libera al empleado anterior.
-     * @param numero Número o código del proyecto.
-     * @param titulo Título de la tarea.
-     * @throw  Exception si no hay empleados disponibles o si no tiene asignado un empleado previamente
-     */
-    public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo)throws Exception;
-
-    // ============================================================
-    // CONSULTAS Y REPORTES
-    // ============================================================
-
-    /**
-     * Calcula el costo total del proyecto (activo, pendiente o finalizado).
-     * @return Costo total acumulado.
-     */
-    public double costoProyecto() ;
-
-    /**
-     * Devuelve una lista de proyectos finalizados (número y domicilio).
-     * @return Lista de tuplas (número, domicilio).
-     */
-    public List<Tupla<Integer, String>> proyectosFinalizados();
-
-    /**
-     * Devuelve una lista de proyectos pendientes (aún no iniciados o incompletos).
-     * @return Lista de tuplas (número, domicilio).
-     */
-    public List<Tupla<Integer, String>> proyectosPendientes();
-
-    /**
-     * Devuelve una lista de proyectos actualmente activos.
-     * @return Lista de tuplas (número, domicilio).
-     */
-    public List<Tupla<Integer, String>> proyectosActivos();
-
-    /**
-     * Devuelve los empleados que no están asignados a ningún proyecto.
-     * @return Arreglo de empleados no asignados.
-     */
-    public Object[] empleadosNoAsignados();
-
-    /**
-     * Indica si un proyecto ya fue finalizado.
-     * @param numero Número o código del proyecto.
-     * @return true si está finalizado, false en caso contrario.
-     */
-    public boolean estaFinalizado(Integer numero);
-
-    /**
-     * Consulta la cantidad total de retrasos acumulados por un empleado.
-     * @param legajo Legajo del empleado.
-     * @return Cantidad de retrasos.
-     */
-    public int consultarCantidadRetrasosEmpleado(Integer legajo) ;
-
-    /**
-     * Devuelve los empleados asignados a un proyecto determinado.
-     * @param numero Número o código del proyecto.
-     * @return Lista de tuplas (legajo, nombre del empleado).
-     */
-    public List<Tupla<Integer, String>> empleadosAsignadosAProyecto(Integer numero);
-
-    // ============================================================
-    // NUEVOS REQUERIMIENTOS
-    // ============================================================
-
-    /**
-     * Devuelve las tareas no asignadas de un proyecto.
-     * @param numero Número o código del proyecto.
-     * @return Arreglo de tareas sin asignar.
-     */
-    public Object[] tareasProyectoNoAsignadas(Integer numero) ;
-    /**
-     * Devuelve las tareas no asignadas de un proyecto.
-     * @param numero Número o código del proyecto.
-     * @return Arreglo de tareas de un proyecto.
-     */
-    public Object[] tareasDeUnProyecto(Integer numero);
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("======== HOME SOLUTION ========\n");
+        for (Proyecto p : proyectos.values()) {
+            sb.append(p.toString()).append("\n------------------------------\n");
+        }
+        return sb.toString();
+    }
 
 
-    /**
-     * Consulta el domicilio del proyecto.
-     * @param numero Número o código del proyecto.
-     * @return Dirección donde se realiza el proyecto.
-     */
-    public String consultarDomicilioProyecto(Integer numero) ;
+//============================================================
+// ASIGNACIÓN Y GESTIÓN DE TAREAS
+// ============================================================
 
-    /**
-     * Indica si un empleado tiene retrasos en tareas asignadas.
-     * @param legajo Legajo del empleado.
-     * @return true si tiene retrasos, false en caso contrario.
-     */
-    public boolean tieneRestrasos(String legajo) ;
+@Override
+public void asignarResponsableEnTarea(Integer numero, String titulo) throws Exception {
+    Proyecto p = proyectos.get(numero);
+    if (p == null) throw new Exception("Proyecto inexistente.");
+    if (p.estaFinalizado()) throw new Exception("El proyecto ya está finalizado.");
 
-    /**
-     * Devuelve la lista de todos los empleados registrados.
-     * @return Lista de tuplas (legajo, nombre del empleado).
-     */
-    public List<Tupla<Integer, String>> empleados();
-    /**
-     * Devuelve la informacion generada en el toString.
-     * @numero numero de proyecto.
-     */
-    public String consultarProyecto(Integer numero);
+    // buscamos un empleado libre cualquiera
+    Empleado libre = null;
+    for (Empleado e : empleados.values()) {
+        if (e.estaLibre()) {
+            libre = e;
+            break;
+        }
+    }
+
+    if (libre == null) {
+        throw new Exception("No hay empleados disponibles.");
+    }
+
+    p.asignarEmpleadoTarea(titulo, libre);
+    empleadosLibres.remove(libre);
 }
+
+@Override
+public void asignarResponsableMenosRetraso(Integer numero, String titulo) throws Exception {
+    Proyecto p = proyectos.get(numero);
+    if (p == null) throw new Exception("Proyecto inexistente.");
+    if (p.estaFinalizado()) throw new Exception("El proyecto ya está finalizado.");
+
+    // buscamos el empleado libre con menos retrasos
+    Empleado mejor = null;
+    for (Empleado e : empleados.values()) {
+        if (e.estaLibre()) {
+            if (mejor == null || e.getCantidadRetrasos() < mejor.getCantidadRetrasos())
+                mejor = e;
+        }
+    }
+
+    if (mejor == null) {
+        throw new Exception("No hay empleados disponibles.");
+    }
+
+    p.asignarEmpleadoTarea(titulo, mejor);
+    empleadosLibres.remove(mejor);
+}
+
+@Override
+public void registrarRetrasoEnTarea(Integer numero, String titulo, double cantidadDias)
+        throws IllegalArgumentException {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    p.registrarRetraso(titulo, cantidadDias);
+}
+
+@Override
+public void agregarTareaEnProyecto(Integer numero, String titulo, String descripcion, double dias)
+        throws IllegalArgumentException {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    p.agregarTarea(titulo, descripcion, dias);
+}
+
+@Override
+public void finalizarTarea(Integer numero, String titulo) throws Exception {
+    Proyecto p = proyectos.get(numero);
+    if (p == null) throw new Exception("Proyecto inexistente.");
+    p.finalizarTarea(titulo);
+}
+
+@Override
+public void finalizarProyecto(Integer numero, String fin) throws IllegalArgumentException {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    p.finalizar(fin);
+}
+
+// ============================================================
+// REASIGNACIÓN DE EMPLEADOS
+// ============================================================
+
+@Override
+public void reasignarEmpleadoEnProyecto(Integer numero, Integer legajo, String titulo) throws Exception {
+    Proyecto p = proyectos.get(numero);
+    if (p == null) throw new Exception("Proyecto inexistente.");
+    if (p.estaFinalizado()) throw new Exception("Proyecto finalizado.");
+
+    Empleado nuevo = empleados.get(legajo);
+    if (nuevo == null) throw new Exception("Empleado inexistente.");
+    if (!nuevo.estaLibre()) throw new Exception("Empleado ocupado.");
+
+    p.reasignarEmpleado(titulo, nuevo);
+}
+
+@Override
+public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) throws Exception {
+    Proyecto p = proyectos.get(numero);
+    if (p == null) throw new Exception("Proyecto inexistente.");
+    if (p.estaFinalizado()) throw new Exception("Proyecto finalizado.");
+
+    Empleado mejor = null;
+    for (Empleado e : empleados.values()) {
+        if (e.estaLibre()) {
+            if (mejor == null || e.getCantidadRetrasos() < mejor.getCantidadRetrasos())
+                mejor = e;
+        }
+    }
+
+    if (mejor == null)
+        throw new Exception("No hay empleados disponibles.");
+
+    p.reasignarEmpleado(titulo, mejor);
+}
+
+// ============================================================
+// CONSULTAS Y REPORTES
+// ============================================================
+
+@Override
+public double costoProyecto() {
+    double total = 0;
+    for (Proyecto p : proyectos.values()) {
+        total += p.calcularCosto();
+    }
+    return total;
+}
+
+@Override
+public int consultarCantidadRetrasosEmpleado(Integer legajo) {
+    Empleado e = empleados.get(legajo);
+    if (e == null)
+        throw new IllegalArgumentException("Empleado inexistente.");
+    return e.getCantidadRetrasos();
+}
+
+@Override
+public List<Tupla<Integer, String>> empleadosAsignadosAProyecto(Integer numero) {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+
+    List<Tupla<Integer, String>> lista = new ArrayList<>();
+    for (Empleado e : p.obtenerEmpleadosAsignados()) {
+        lista.add(new Tupla<>(e.getLegajo(), e.getNombre()));
+    }
+    return lista;
+}
+
+@Override
+public Object[] tareasProyectoNoAsignadas(Integer numero) {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+
+    List<Tarea> noAsignadas = new ArrayList<>();
+    for (Tarea t : p.obtenerTareas()) {
+        if (!t.estaAsignada())
+            noAsignadas.add(t);
+    }
+    return noAsignadas.toArray();
+}
+
+@Override
+public Object[] tareasDeUnProyecto(Integer numero) {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    return p.obtenerTareas().toArray();
+}
+
+@Override
+public String consultarDomicilioProyecto(Integer numero) {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    return p.getDireccion();
+}
+
+@Override
+public boolean tieneRestrasos(String legajo) {
+    int num = Integer.parseInt(legajo);
+    Empleado e = empleados.get(num);
+    if (e == null)
+        throw new IllegalArgumentException("Empleado inexistente.");
+    return e.getCantidadRetrasos() > 0;
+}
+
+@Override
+public List<Tupla<Integer, String>> empleados() {
+    List<Tupla<Integer, String>> lista = new ArrayList<>();
+    for (Empleado e : empleados.values()) {
+        lista.add(new Tupla<>(e.getLegajo(), e.getNombre()));
+    }
+    return lista;
+}
+
+@Override
+public String consultarProyecto(Integer numero) {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    return p.toString();
+}
+}   
