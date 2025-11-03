@@ -18,9 +18,7 @@ public class HomeSolution implements IHomeSolution {
         this.contadorLegajos = 0;
     }
 
-    // ============================================================
-    // REGISTRO DE EMPLEADOS
-    // ============================================================
+
 
     @Override
     public void registrarEmpleado(String nombre, double valor) throws IllegalArgumentException {
@@ -46,9 +44,7 @@ public class HomeSolution implements IHomeSolution {
         empleadosLibres.add(emp);
     }
 
-    // ============================================================
-    // REGISTRO DE PROYECTOS
-    // ============================================================
+
 
     @Override
     public void registrarProyecto(String[] titulos, String[] descripcion, double[] dias,
@@ -71,9 +67,6 @@ public class HomeSolution implements IHomeSolution {
         proyectos.put(contadorProyectos, proyecto);
     }
 
-    // ============================================================
-    // CONSULTAS BÁSICAS
-    // ============================================================
 
     @Override
     public Object[] empleadosNoAsignados() {
@@ -122,9 +115,7 @@ public class HomeSolution implements IHomeSolution {
         return lista;
     }
 
-    // ============================================================
-    // TO STRING GENERAL
-    // ============================================================
+
 
     @Override
     public String toString() {
@@ -137,9 +128,7 @@ public class HomeSolution implements IHomeSolution {
     }
 
 
-//============================================================
-// ASIGNACIÓN Y GESTIÓN DE TAREAS
-// ============================================================
+
 
 @Override
 public void asignarResponsableEnTarea(Integer numero, String titulo) throws Exception {
@@ -220,9 +209,7 @@ public void finalizarProyecto(Integer numero, String fin) throws IllegalArgument
     p.finalizar(fin);
 }
 
-// ============================================================
-// REASIGNACIÓN DE EMPLEADOS
-// ============================================================
+
 
 @Override
 public void reasignarEmpleadoEnProyecto(Integer numero, Integer legajo, String titulo) throws Exception {
@@ -257,9 +244,7 @@ public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) thro
     p.reasignarEmpleado(titulo, mejor);
 }
 
-// ============================================================
-// CONSULTAS Y REPORTES
-// ============================================================
+
 
 @Override
 public double costoProyecto(Integer numero) {

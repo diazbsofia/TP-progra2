@@ -1,17 +1,6 @@
 package entidades;
 
-/**
- * Clase abstracta Empleado
- *
- * Representa un empleado genérico del sistema.
- *
- * IREP:
- * - legajo > 0
- * - nombre no nulo ni vacío
- * - cantidadRetrasos >= 0
- * - Si ocupado = true, está asignado a una tarea activa
- * - Si ocupado = false, no está asignado a ninguna tarea
- */
+
 public abstract class Empleado {
     protected String nombre;
     protected int legajo;

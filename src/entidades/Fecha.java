@@ -6,13 +6,11 @@ public class Fecha {
     private int mes;
     private int anio;
 
-    // Días de cada mes (sin contemplar bisiestos todavía)
+ 
     private static final int[] DIAS_POR_MES = 
         { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    // ==========================
-    // CONSTRUCTOR
-    // ==========================
+
     public Fecha(int dia, int mes, int anio) {
         if (!esFechaValida(dia, mes, anio)) {
             throw new IllegalArgumentException("Fecha inválida: " + dia + "/" + mes + "/" + anio);
@@ -22,9 +20,7 @@ public class Fecha {
         this.anio = anio;
     }
 
-    // ==========================
-    // MÉTODOS AUXILIARES
-    // ==========================
+
 
     private boolean esFechaValida(int d, int m, int a) {
         if (a < 1 || m < 1 || m > 12 || d < 1) return false;
@@ -41,9 +37,7 @@ public class Fecha {
         return (a % 4 == 0 && a % 100 != 0) || (a % 400 == 0);
     }
 
-    // ==========================
-    // SUMAR / RESTAR DÍAS
-    // ==========================
+
 
     public Fecha sumarDias(int cantidad) {
         if (cantidad < 0) return restarDias(-cantidad);
@@ -96,9 +90,7 @@ public class Fecha {
         return new Fecha(nuevoDia, nuevoMes, nuevoAnio);
     }
 
-    // ==========================
-    // COMPARACIÓN
-    // ==========================
+
 
     public int comparar(Fecha otra) {
         if (this.anio != otra.anio) return this.anio < otra.anio ? -1 : 1;
@@ -119,18 +111,14 @@ public class Fecha {
         return comparar(otra) == 1;
     }
 
-    // ==========================
-    // TO STRING
-    // ==========================
+
 
     @Override
     public String toString() {
         return String.format("%02d/%02d/%04d", dia, mes, anio);
     }
 
-    // ==========================
-    // GETTERS
-    // ==========================
+
 
     public int getDia() {
         return dia;

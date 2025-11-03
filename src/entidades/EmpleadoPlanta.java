@@ -1,13 +1,6 @@
 package entidades;
 
-/**
- * Representa un empleado de planta.
- *
- * IREP:
- * - valorDia > 0
- * - categoría válida: "INICIAL", "TÉCNICO" o "EXPERTO"
- * - cantidadRetrasos >= 0
- */
+
 public class EmpleadoPlanta extends Empleado {
     private double valorDia;
     private String categoria;

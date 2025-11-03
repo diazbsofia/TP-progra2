@@ -1,12 +1,6 @@
 package entidades;
 
-/**
- * Representa un empleado contratado por hora.
- *
- * IREP:
- * - valorHora > 0
- * - cantidadRetrasos >= 0
- */
+
 public class EmpleadoContratado extends Empleado {
     private double valorHora;
 
