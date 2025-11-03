@@ -18,7 +18,7 @@ public class EmpleadoContratado extends Empleado {
     }
 
     @Override
-    public double calcularPago(int diasTrabajados) {
+    public double calcularPago(double diasTrabajados) {
         return valorHora * 8 * diasTrabajados;
     }
 

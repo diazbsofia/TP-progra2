@@ -23,11 +23,11 @@ public class EmpleadoPlanta extends Empleado {
     }
 
     @Override
-    public double calcularPago(int diasTrabajados) {
+    public double calcularPago(double diasTrabajados) {
         double pago = valorDia * diasTrabajados;
-        // Si no tuvo retrasos, gana 2% adicional
+       
         if (cantidadRetrasos == 0) {
-            pago += pago * 0.02;
+        	pago *= 1.02;
         }
         return pago;
     }
@@ -50,4 +50,6 @@ public class EmpleadoPlanta extends Empleado {
     public String toString() {
         return super.toString() + " - Planta (" + categoria + ", $" + valorDia + "/día)";
     }
+
+
 }

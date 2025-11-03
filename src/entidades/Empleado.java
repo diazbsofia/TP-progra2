@@ -60,7 +60,7 @@ public abstract class Empleado {
     }
 
     // Método abstracto: se sobreescribe en subclases
-    public abstract double calcularPago(int diasTrabajados);
+    public abstract double calcularPago(double dias);
 
     @Override
     public String toString() {

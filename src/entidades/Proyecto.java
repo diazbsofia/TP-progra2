@@ -28,14 +28,16 @@ public class Proyecto {
         }
         
         this.numero = numero;
-        this.cliente = cliente;
+        if (datosCliente != null && datosCliente.length >= 3) { 
+            this.cliente = new Cliente(datosCliente[0], datosCliente[1], datosCliente[2]);
+        }
         this.direccion = direccion;
         this.fechaInicio = fechaInicio;
         this.fechaEstimada = fechaEstimada;
         this.fechaReal = fechaEstimada;
-        this.estado = "pendiente";
+        this.estado = Estado.pendiente;
         this.costoFinal = 0;
-        this.listaDeTareas = new ArrayList<>();
+        this.listaDeTareas = new ArrayList<>(tareas);
         this.historialEmpleados = new ArrayList<>();
     }
 
@@ -127,7 +129,7 @@ public class Proyecto {
         for (Tarea tarea : listaDeTareas) {
             if (tarea.estaAsignada() && !tarea.estaFinalizada()) {
                 Empleado emp = tarea.obtenerEmpleado();
-                if (emp != null && emp.isOcupado()) {
+                if (emp != null && emp.estaOcupado()) {
                     emp.liberar();
                 }
             }
@@ -149,6 +151,12 @@ public class Proyecto {
                 double pago = tarea.obtenerEmpleado().calcularPago(dias);
                 costoTotal += pago;
             }
+        }
+        
+        if (tieneRetrasos()) {
+            costoTotal *= 1.25; // 25% adicional si tiene retrasos
+        } else {
+            costoTotal *= 1.35; // 35% adicional si NO tiene retrasos
         }
         
         return costoTotal;

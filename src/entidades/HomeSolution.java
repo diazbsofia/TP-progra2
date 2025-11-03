@@ -77,10 +77,10 @@ public class HomeSolution implements IHomeSolution {
 
     @Override
     public Object[] empleadosNoAsignados() {
-        List<Empleado> libres = new ArrayList<>();
+        List<Integer> libres = new ArrayList<>();
         for (Empleado e : empleados.values()) {
             if (e.estaLibre())
-                libres.add(e);
+                libres.add(e.getLegajo());
         }
         return libres.toArray();
     }
@@ -262,12 +262,11 @@ public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) thro
 // ============================================================
 
 @Override
-public double costoProyecto() {
-    double total = 0;
-    for (Proyecto p : proyectos.values()) {
-        total += p.calcularCosto();
-    }
-    return total;
+public double costoProyecto(Integer numero) {
+    Proyecto p = proyectos.get(numero);
+    if (p == null)
+        throw new IllegalArgumentException("Proyecto inexistente.");
+    return p.calcularCosto();
 }
 
 @Override
@@ -296,7 +295,8 @@ public Object[] tareasProyectoNoAsignadas(Integer numero) {
     Proyecto p = proyectos.get(numero);
     if (p == null)
         throw new IllegalArgumentException("Proyecto inexistente.");
-
+    if (p.estaFinalizado())
+        throw new IllegalArgumentException("El proyecto está finalizado.");
     List<Tarea> noAsignadas = new ArrayList<>();
     for (Tarea t : p.obtenerTareas()) {
         if (!t.estaAsignada())
@@ -322,8 +322,8 @@ public String consultarDomicilioProyecto(Integer numero) {
 }
 
 @Override
-public boolean tieneRestrasos(String legajo) {
-    int num = Integer.parseInt(legajo);
+public boolean tieneRestrasos(Integer legajo) {
+    int num = legajo;
     Empleado e = empleados.get(num);
     if (e == null)
         throw new IllegalArgumentException("Empleado inexistente.");
