@@ -71,12 +71,18 @@ public class HomeSolution implements IHomeSolution {
     @Override
     public Object[] empleadosNoAsignados() {
         List<Integer> libres = new ArrayList<>();
-        for (Empleado e : empleados.values()) {
-            if (e.estaLibre())
+
+        Iterator<Empleado> it = empleados.values().iterator();
+        while (it.hasNext()) {
+            Empleado e = it.next();
+            if (e.estaLibre()) {
                 libres.add(e.getLegajo());
+            }
         }
+
         return libres.toArray();
     }
+
 
     @Override
     public boolean estaFinalizado(Integer numero) {
