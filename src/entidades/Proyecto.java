@@ -124,8 +124,7 @@ public class Proyecto {
         
         this.fechaReal = fechaFin;
         this.estado = Estado.finalizado;
-        
-        // Liberamos empleados asignados
+
         for (Tarea tarea : listaDeTareas) {
             if (tarea.estaAsignada() && !tarea.estaFinalizada()) {
                 Empleado emp = tarea.obtenerEmpleado();
@@ -154,7 +153,7 @@ public class Proyecto {
         }
         
         if (tieneRetrasos()) {
-            costoTotal *= 1.25; // 25% adicional si tiene retrasos
+            costoTotal *= 1.25; // 25% adicional si tiene retrssos
         } else {
             costoTotal *= 1.35; // 35% adicional si NO tiene retrasos
         }
@@ -268,7 +267,7 @@ public class Proyecto {
         sb.append("Fecha inicio: ").append(fechaInicio).append("\n");
         sb.append("Fecha estimada: ").append(fechaEstimada).append("\n");
         sb.append("Fecha real: ").append(fechaReal).append("\n");
-        sb.append("Costo final: $").append(String.format("%.2f", costoFinal)).append("\n"); // el %.2f es para que el numero tenga hasta 2 cifras decimales
+        sb.append("Costo final: $").append(String.format("%.2f", costoFinal)).append("\n"); 
         sb.append("Retrasos: ").append(tieneRetrasos() ? "Sí" : "No").append("\n");
         sb.append("\nTareas:\n");
         for (Tarea t : listaDeTareas) {

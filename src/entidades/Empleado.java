@@ -48,7 +48,6 @@ public abstract class Empleado {
         return ocupado;
     }
 
-    // Método abstracto: se sobreescribe en subclases
     public abstract double calcularPago(double dias);
 
     @Override

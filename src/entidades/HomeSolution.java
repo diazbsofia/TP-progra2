@@ -142,7 +142,7 @@ public void asignarResponsableEnTarea(Integer numero, String titulo) throws Exce
     if (p == null) throw new Exception("Proyecto inexistente.");
     if (p.estaFinalizado()) throw new Exception("El proyecto ya está finalizado.");
 
-    // buscamos un empleado libre cualquiera
+  
     Empleado libre = null;
     for (Empleado e : empleados.values()) {
         if (e.estaLibre()) {
@@ -165,7 +165,7 @@ public void asignarResponsableMenosRetraso(Integer numero, String titulo) throws
     if (p == null) throw new Exception("Proyecto inexistente.");
     if (p.estaFinalizado()) throw new Exception("El proyecto ya está finalizado.");
 
-    // buscamos el empleado libre con menos retrasos
+  
     Empleado mejor = null;
     for (Empleado e : empleados.values()) {
         if (e.estaLibre()) {
@@ -240,7 +240,6 @@ public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) thro
     if (empleadosLibres.isEmpty())
         throw new Exception("No hay empleados disponibles.");
 
-    // Buscar el empleado libre con menos retrasos
     Empleado mejor = null;
     for (Empleado e : empleadosLibres) {
         if (mejor == null || e.getCantidadRetrasos() < mejor.getCantidadRetrasos()) {
@@ -251,10 +250,8 @@ public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) thro
     if (mejor == null)
         throw new Exception("No hay empleados disponibles.");
 
-    // Reasignar
     p.reasignarEmpleado(titulo, mejor);
 
-    // Sacarlo de la lista de libres porque ahora está ocupado
     empleadosLibres.remove(mejor);
 }
 
