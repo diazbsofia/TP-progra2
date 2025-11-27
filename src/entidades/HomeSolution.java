@@ -232,24 +232,31 @@ public void reasignarEmpleadoEnProyecto(Integer numero, Integer legajo, String t
 
 @Override
 public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) throws Exception {
+
     Proyecto p = proyectos.get(numero);
     if (p == null) throw new Exception("Proyecto inexistente.");
     if (p.estaFinalizado()) throw new Exception("Proyecto finalizado.");
 
+    if (empleadosLibres.isEmpty())
+        throw new Exception("No hay empleados disponibles.");
+
+    // Buscar el empleado libre con menos retrasos
     Empleado mejor = null;
-    for (Empleado e : empleados.values()) {
-        if (e.estaLibre()) {
-            if (mejor == null || e.getCantidadRetrasos() < mejor.getCantidadRetrasos())
-                mejor = e;
+    for (Empleado e : empleadosLibres) {
+        if (mejor == null || e.getCantidadRetrasos() < mejor.getCantidadRetrasos()) {
+            mejor = e;
         }
     }
 
     if (mejor == null)
         throw new Exception("No hay empleados disponibles.");
 
+    // Reasignar
     p.reasignarEmpleado(titulo, mejor);
-}
 
+    // Sacarlo de la lista de libres porque ahora está ocupado
+    empleadosLibres.remove(mejor);
+}
 
 
 @Override
